@@ -7,9 +7,9 @@ typedef struct Tensor {
     float* data;
     int* shape;
     int rank;
-    struct Tensor* grad;
-    bool requires_grad;
-    struct Operation* creator;
+    struct Tensor* grad;        // Gradient of the tensor
+    bool requires_grad;         // Does this tensor require gradients
+    struct Operation* creator;  // Operation that created this tensor
 } Tensor;
 
 typedef struct Operation {
@@ -26,6 +26,8 @@ Tensor* tensor_add(Tensor* tensor1, Tensor* tensor2);
 Tensor* tensor_subtract(Tensor* tensor1, Tensor* tensor2);
 Tensor* tensor_multiply(Tensor* tensor1, Tensor* tensor2);
 Tensor* tensor_divide(Tensor* tensor1, Tensor* tensor2);
+
+// Helper functions
 void index_to_indices(int index, int* indices, int* shape, int rank);
 int tensor_size(Tensor* tensor);
 
