@@ -1,14 +1,8 @@
 #include "tensor.h"
+#include "autograd.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-
-
-// Global error state
-int tensor_errno = 0;
-const char* SHAPE_ERR_MSG = "Tensors have incompatible shape\n";
-#define TENSOR_SUCESS 0
-#define TENSOR_INVALID_SHAPE 1
 
 // Helper function to calculate the total size of the tensor
 int tensor_size(Tensor* tensor) {
@@ -92,69 +86,3 @@ void tensor_set(Tensor* tensor, int* indices, float value) {
     tensor->data[index] = value;
 }
 
-Tensor* tensor_add(Tensor* tensor1, Tensor* tensor2) {
-    if (!validate_same_shape(tensor1, tensor2)) {
-        printf("%s", SHAPE_ERR_MSG);
-        tensor_errno = TENSOR_INVALID_SHAPE;
-        return NULL;
-    }
-    bool requires_grad = tensor1->requires_grad || tensor2->requires_grad;
-    Tensor* result = tensor_create(tensor1->shape, tensor1->rank, requires_grad);
-    int size = tensor_size(tensor1);
-
-    for (int i = 0; i < size; i++) {
-        result->data[i] = tensor1->data[i] + tensor2->data[i];
-    }
-
-    return result;
-}
-
-Tensor* tensor_subtract(Tensor* tensor1, Tensor* tensor2) {
-    if (!validate_same_shape(tensor1, tensor2)) {
-        printf("%s", SHAPE_ERR_MSG);
-        tensor_errno = TENSOR_INVALID_SHAPE;
-        return NULL;
-    }
-    bool requires_grad = tensor1->requires_grad || tensor2->requires_grad;
-    Tensor* result = tensor_create(tensor1->shape, tensor1->rank, requires_grad);
-
-    int size = tensor_size(tensor1);
-
-    for (int i = 0; i < size; i++) {
-        result->data[i] = tensor1->data[i] - tensor2->data[i];
-    }
-    return result;
-}
-
-Tensor* tensor_multiply(Tensor* tensor1, Tensor* tensor2) {
-    if (!validate_same_shape(tensor1, tensor2)) {
-        printf("%s", SHAPE_ERR_MSG);
-        tensor_errno = TENSOR_INVALID_SHAPE;
-        return NULL;
-    }
-    bool requires_grad = tensor1->requires_grad || tensor2->requires_grad;
-    Tensor* result = tensor_create(tensor1->shape, tensor1->rank, requires_grad);
-    int size = tensor_size(tensor1);
-
-    for (int i = 0; i < size; i++) {
-        result->data[i] = tensor1->data[i] * tensor2->data[i];
-    }
-
-    return result;
-}
-
-Tensor* tensor_divide(Tensor* tensor1, Tensor* tensor2) {
-    if (!validate_same_shape(tensor1, tensor2)) {
-        printf("%s", SHAPE_ERR_MSG);
-        tensor_errno = TENSOR_INVALID_SHAPE;
-        return NULL;
-    }
-    bool requires_grad = tensor1->requires_grad || tensor2->requires_grad;
-    Tensor* result = tensor_create(tensor1->shape, tensor1->rank, requires_grad);
-    int size = tensor_size(tensor1);
-    for (int i = 0; i < size; i++) {
-        result->data[i] = tensor1->data[i] / tensor2->data[i];
-    }
-
-    return result;
-}

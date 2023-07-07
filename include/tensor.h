@@ -2,14 +2,22 @@
 #define TENSOR_H
 #include <stdbool.h>
 
-// Tensor data structure
+
+// Global error state
+
+extern int tensor_errno;
+const char* SHAPE_ERR_MSG;
+#define TENSOR_SUCESS 0
+#define TENSOR_INVALID_SHAPE 1
+
 typedef struct Tensor {
-    float* data;
-    int* shape;
-    int rank;
-    struct Tensor* grad;        // Gradient of the tensor
-    bool requires_grad;         // Does this tensor require gradients
-    struct Operation* creator;  // Operation that created this tensor
+    int* shape;          // Array representing the shape of the tensor
+    int rank;            // Number of dimensions
+    float* data;         // Array to hold tensor data
+    bool requires_grad;  // Boolean flag to indicate if this tensor needs gradients
+    float* grad;         // Array to hold tensor gradient
+    struct Tensor* inputs[2];  // Input tensors
+    void (*grad_fn)(struct Tensor*, struct Tensor*); // Function pointer for the gradient function
 } Tensor;
 
 typedef struct Operation {
@@ -30,6 +38,7 @@ Tensor* tensor_divide(Tensor* tensor1, Tensor* tensor2);
 // Helper functions
 void index_to_indices(int index, int* indices, int* shape, int rank);
 int tensor_size(Tensor* tensor);
+bool validate_same_shape(Tensor* tensor1, Tensor* tensor2);
 
 
 #endif // TENSOR_H
